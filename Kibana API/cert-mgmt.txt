@@ -1,0 +1,2 @@
+certreq.exe -attrib "CertificateTemplate:Web-Server" c:\temp\pki\request.csr c:\temp\pki\outfile.cer && Get-Content C:\temp\pki\outfile.cer
+Get-Content C:\temp\pki\outfile.cer

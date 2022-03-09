@@ -1,0 +1,41 @@
+### kibana api ###
+
+### 1. install jq JSON Processing ###
+
+sudo yum -y install jq
+
+### BULK change Rule Action Script ###
+### requirements :
+#	base64 encoded username:password -> replace 
+#	kibana url
+#	kibana url per page settings
+#	actions.id of the created connectors
+#   -> curl -X GET 'https://kibana.diosen.de:5601/api/actions/connectors' --header 'kbn-xsrf: true' --header 'Content-Type: multipart/form-data' --header 'Authorization: Basic ZWxhc3RpYzplbGFzdGlj'
+
+
+for i in $(curl --silent --location --request GET 'https://kibana.diosen.de:5601/api/detection_engine/rules/_find?per_page=250&filter=alert.attributes.enabled:true' --header 'kbn-xsrf: kibana' --header 'Content-Type: multipart/form-data' --header 'Authorization: Basic ZWxhc3RpYzplbGFzdGlj' | jq .data[].id); do
+
+echo "Updating Rule ID $i"
+
+curl --silent --location --request PATCH 'https://kibana.diosen.de:5601/api/detection_engine/rules' --header 'kbn-xsrf: kibana' --header 'Authorization: Basic ZWxhc3RpYzplbGFzdGlj' --header 'Content-Type: application/json' --data-raw '{
+    "id":'$i',
+    "throttle": "rule", 
+    "actions":[
+        {
+            "action_type_id": ".email",
+            "id": "1f0e0740-9f17-11ec-92ab-69b93dfe0e84",
+            "params": {
+                "message":"Rule {{context.rule.name}} generated {{state.signals_count}} alerts",
+                "to":["diosen@diosen.de"],
+                "subject":"{{alert.actionSubgroup}}"
+           },
+            "group": "default"
+          }
+        ]
+}' | jq .
+
+echo "Rule ID $i has been updated."
+done
+
+
+#####################

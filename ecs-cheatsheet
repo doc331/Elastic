@@ -1,0 +1,27 @@
+##ecs
+
+event.module
+apache
+
+event.dataset
+apache.access
+
+Categorization Fields
+event.kind, event.category, event.type, event.outcome
+
+event.category
+authentication, configuration, database, driver, email, file, host, iam, intrusion_detection, malware, network, package, process, registry, session, threat, web
+
+Expected event types for category network: access, allowed, connection, denied, end, info, protocol, start
+
+event.action
+group-add, process-started, file-created, user-password-change
+
+event.type 
+access, admin, allowed, change, connection, creation, deletion, denied, end, error, group, indicator, info, installation, protocol, start, user
+
+event.outcome
+failure, success, unknown
+
+event.code
+6701

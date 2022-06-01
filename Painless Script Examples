@@ -1,0 +1,32 @@
+### -- Enrich data from params to a new field -- ###
+
+Source:
+
+def mactoname = params[ctx.client.mac];
+if (mactoname != null) {
+    ctx['user_agent.device.name'] = mactoname;
+}
+
+Parameters:
+
+{
+  "51:16:a7:73:06:c4": "thermomix-7306cf",
+  "60:1d:9d:3c:f4:18": "MI-TV-EG",
+  "88:d1:d9:05:8e:83": "Nokia-TAB",
+  "f8:5d:ac:e2:ca:71": "HP-Printer"
+}
+
+### -- Enrich data from params and override field -- ###
+
+def status = params[ctx.event.code];
+if (status != null) {
+  ctx.event.code = status;
+}
+
+Parameters:
+
+{
+  "0": "ignored",
+  "1": "blocked",
+  "2": "terminated"
+}

@@ -1,3 +1,21 @@
+#--> CYLANCE API REQUESTS
+
+
+#> device extended
+https://protectapi.cylance.com/devices/v2/extended?page=1&page_size=100
+
+#> global list
+https://protectapi.cylance.com/globallists/v2?listTypeId=[0|1]?pageNumber=1&pageSize=20&filterBy=none
+
+#> memory protection
+https://protectapi.cylance.com/memoryprotection/v2?page=1&page_size=100&start_time=2019-11-01T12:00:00&end_time:2019-11-30T12:00:00
+
+#> detections (Optics)
+https://protectapi.cylance.com/detections/v2?page=1&page_size=100&sort=OccurrenceTime
+
+#> threats
+https://protectapi.cylance.com/threats/v2?page=1&page_size=100&start_time=2019-11-01T12:00:00.000Z&end_time:2019-11-30T12:00:00.000Z
+
 #--> ENRICHMENT FOR CYLANCE MEMORY PROTECTION
 
 #> action

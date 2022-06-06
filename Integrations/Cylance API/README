@@ -1,0 +1,30 @@
+#--> ENRICHMENT FOR CYLANCE MEMORY PROTECTION
+
+#> action
+
+{
+  "0": "None",
+  "2": "Block",
+  "3": "Terminate"
+}
+
+#> violation_type
+
+{
+  "1": "Stack pivot",
+  "2": "Stack protect",
+  "3": "Overwrite code",
+  "4": "Remote allocation of memory",
+  "5": "Remote mapping of memory",
+  "6": "Remote write to memory",
+  "7": "Remote write PE to memory",
+  "8": "Remote overwrite code",
+  "9": "Remote unmap of memory",
+  "10": "Remote thread creation",
+  "11": "Remote APC scheduled",
+  "12": "LSASS read",
+  "13": "RAM scraping",
+  "22": "Zero allocate",
+  "23": "DYLD injection",
+  "24": "Malicous payload"
+}

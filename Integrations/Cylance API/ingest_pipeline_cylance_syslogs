@@ -1,0 +1,33 @@
+PUT _ingest/pipeline/logs-cylance.api-default
+{
+  "processors": [
+    {
+      "pipeline": {
+        "name": "logs-cylance.json-default",
+        "if": "ctx.message.startsWith('{')"
+      }
+    },
+    {
+      "set": {
+        "field": "event.original",
+        "copy_from": "message"
+      }
+    },
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          "%{POSINT:log.syslog.priority} <%{INT:log.syslog.version}>1 %{TIMESTAMP_ISO8601:event.created} %{WORD} %{WORD:event.provider} %{GREEDYDATA}Event Type: %{WORD:event.dataset}, %{GREEDYDATA:msg}"
+        ]
+      }
+    },
+    {
+      "dissect": {
+        "field": "msg",
+        "pattern": "Event Name: %{event.action}, Device Name: %{host.name}, File Path: %{file.path}, SHA256: %{file.hash.sha256}, Interpreter: %{process.parent.name}, Interpreter Version: %{?}, Zone Names: %{?}, Device ID: %{Device_ID}, Policy Name: %{policy.name}",
+        "ignore_missing": true,
+        "if": "ctx.event.dataset == \"ScriptControl\""
+      }
+    }
+  ]
+}

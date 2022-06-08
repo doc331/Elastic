@@ -1,0 +1,78 @@
+#--> Expected Logs and ECS Fields
+
+
+#-> Syslogs
+
+
+#> Header ( Grok )
+
+%{POSINT:log.syslog.priority} <%{INT:log.syslog.version}>1 %{TIMESTAMP_ISO8601:event.created} %{WORD} %{WORD:event.provider} %{GREEDYDATA}Event Type: %{WORD:event.dataset}, %{GREEDYDATA:msg}
+
+
+#> ScriptControl ( Dissect )
+
+Event Name: %{event.action}, Device Name: %{host.name}, File Path: %{file.path}, SHA256: %{file.hash.sha256}, Interpreter: %{cylance.interpreter}, Interpreter Version: %{cylance.interpreter_version}, Zone Names: %{cylance.zone_name}, Device ID: %{cylance.device_id}, Policy Name: %{cylance.policy_name}
+
+#> O-Logs
+
+724 <46>1 2022-06-07T20:54:08.321000Z sysloghost CylancePROTEC - - - Event Type: ScriptControl, Event Name: Blocked, Device Name: Fake_Device, File Path: d:\windows\system32\windowspowershell\v2.1\newlyMade.vbs, SHA256: FE9B64DEFD8BF214C7490BB7F35B495A79A95E81F8943EE279DC99998D3D3440, Interpreter: active, Interpreter Version: 6.1.7600.16385 (win7_rtm.090713-1255), Zone Names: (Script Test,Server Test), Device ID: e378dacb-9324-453a-b8c6-5a8406952195, Policy Name: Default
+
+
+#> Device ( Dissect )
+
+
+#> O-Logs
+
+724 <46>1 2022-06-07T20:54:08.321000Z sysloghost CylancePROTEC - - - Event Type: Device, Event Name: Registration, Device Name: WIN-55NATVQHBUU
+
+724 <46>1 2022-06-07T20:54:08.321000Z sysloghost CylancePROTEC - - - Event Type: Device, Event Name: SystemSecurity, Device Name: WIN-55NATVQHBUU, Agent Version: 1.1.1270.58, IP Address: (10.3.0.154), MAC Address: (005056881877), Logged On Users: (WIN-55NATVQHBUU\Administrator), OS: Microsoft Windows Server 2008 R2 Standard Service Pack 1 x64 6.1.7601
+
+724 <46>1 2022-06-07T20:54:08.321000Z sysloghost CylancePROTEC - - - Event Type: Device, Event Name: Device Removed, Device Names: (jsmithxp-test), User: (jsmith@contoso.com)
+
+724 <46>1 2022-06-07T20:54:08.321000Z sysloghost CylancePROTEC - - - Event Type: Device, Event Name: Device Updated, Device Message: Renamed: 'WIN-55NATVQHBUU' to 'WIN-2008R2-IRV1'; Policy Changed: 'Default' to 'IRVPolicy1'; Zones Added: 'IRV1', User: John Smith (johnsmith@contoso.com)
+
+
+#> DeviceControl ( Dissect )
+
+
+
+#> O-Logs
+
+CylancePROTECT: Event Type: DeviceControl, Event Name: fullaccess, Device Name: Test_Device_1, External Device Type: iOS, External Device Vendor ID: 1953, External Device Name: Generic USB Drive - 2017/02/16-01, External Device Product ID: 0202, External Device Serial Number: 575833314133343210041246, Zone Names: (test_zone_02)
+
+
+#> Audit Log ( Dissect )
+
+#> O-Logs
+
+
+#-> Cylance API
+
+#> Device
+
+cylance.device_id host.name cylance.state cylance.agent_version cylance.policy_name cylance.policy_id cylance.date_first_registered client.ip client.mac
+               id	   name		    state		  agent_version         policy.name         policy.id         date_first_registered ip_addresses mac_addresses
+			   
+			   
+#> Global List
+
+file.name file.hash.sha256 file.hash.md5 cylance.threat_score cylance.av_industry cylance.threat_classification cylance.threat_sub_classification cylance.list_type cylance.threat_category cylance.added cylance.added_by cylance.reason
+     name           sha256           md5        cylance_score         av_industry                classification                sub_classification         list_type                category         added         added_by         reason
+	 
+
+#> Threats
+
+file.name file.hash.sha256 file.hash.md5 cylance.threat_score cylance.av_industry cylance.threat_classification cylance.threat_sub_classification cylance.global_quarantine cylance.safelisted file.size cylance.unique_to_cylance cylance.last_found
+     name           sha256           md5        cylance_score         av_industry                classification                sub_classification         global_quarantine         safelisted file_size         unique_to_cylance         last_found
+	
+	
+#> MemoryProtection
+
+cylance.device_image_file_event_id cylance.device_id cylance.file_hash_id file.path cylance.process_id client.user.name client.user.group.name client.user.id cylance.violation_type event.type file.pe.file_version dll.pe.file_version @timestamp cylance.agent_event_id
+        device_image_file_event_id         device_id         X-DROP       image_name    X-DROP         username             groups		          sid         violation_type     action         file_version         dll_version    created         X-DROP
+		
+
+#> Detection		
+
+cylance.PhoneticId cylance.status cylance.Id cylance.severity cylance.OccurrenceTime event.created host.name cylance.Device_CylanceId cylance.DetectionDescription
+        PhoneticId         Status    X-DROP          Severity         OccurrenceTime  ReceivedTime Device.Name       Device.CylanceId         DetectionDescription

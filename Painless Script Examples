@@ -30,3 +30,22 @@ Parameters:
   "1": "blocked",
   "2": "terminated"
 }
+
+### -- Drop Nested Fields for example for all "host."-fields -- ###
+
+void iterateAllFields(def x) {
+             if (x instanceof List) {
+               for (def v: x) {
+                 iterateAllFields(v);
+               }
+             }
+             if (!(x instanceof Map)) {
+               return;
+             }
+             x.entrySet().removeIf(e -> e.getKey() =~ /host.*/);
+             for (def v: x.values()) {
+               iterateAllFields(v);
+             }
+           }
+
+           iterateAllFields(ctx);

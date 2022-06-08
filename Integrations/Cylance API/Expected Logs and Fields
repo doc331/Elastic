@@ -68,8 +68,8 @@ file.name file.hash.sha256 file.hash.md5 cylance.threat_score cylance.av_industr
 	
 #> MemoryProtection
 
-cylance.device_image_file_event_id cylance.device_id cylance.file_hash_id file.path cylance.process_id client.user.name client.user.group.name client.user.id cylance.violation_type event.type file.pe.file_version dll.pe.file_version @timestamp cylance.agent_event_id
-        device_image_file_event_id         device_id         X-DROP       image_name    X-DROP         username             groups		          sid         violation_type     action         file_version         dll_version    created         X-DROP
+cylance.device_image_file_event_id cylance.device_id cylance.file_hash_id file.path cylance.process_id client.user.name client.user.group.name client.user.id cylance.violation_type cylance.action file.pe.file_version dll.pe.file_version @timestamp cylance.agent_event_id
+        device_image_file_event_id         device_id         X-DROP       image_name    X-DROP                username              groups		           sid        violation_type         action         file_version         dll_version    created         X-DROP
 		
 
 #> Detection		

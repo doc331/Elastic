@@ -144,7 +144,7 @@ echo -e "$GREEN[OK]$NORMAL -> Flushed a data stream or index"
 
 curl --silent -X PUT -u elastic:$elastic1 https://$m1:9200/_cluster/settings \
   -H "Content-Type: application/json" \
-  -d '{"persistent":{"cluster.routing.allocation.enable":"none"}}'
+  -d '{"persistent":{"cluster.routing.allocation.enable":"primaries"}}'
 echo ""
 echo -e "$GREEN[OK]$NORMAL -> Disable shard allocation..."
   
@@ -166,7 +166,7 @@ echo ""
 echo "Re-enabling shard allocation"
 curl --silent -X PUT -u elastic:$elastic1 https://$m1:9200/_cluster/settings \
   -H "Content-Type: application/json" \
-  -d '{"persistent":{"cluster.routing.allocation.enable":"all"}}'
+  -d '{"persistent":{"cluster.routing.allocation.enable":null}}'
 echo ""
 
 while true; do
@@ -196,7 +196,7 @@ echo ""
 echo "Disable shard allocation..."
 curl --silent -X PUT -u elastic:$elastic1 https://$m1:9200/_cluster/settings \
   -H "Content-Type: application/json" \
-  -d '{"persistent":{"cluster.routing.allocation.enable":"none"}}'
+  -d '{"persistent":{"cluster.routing.allocation.enable":"primaries"}}'
 echo ""
   
 ssh $d2 'systemctl stop elasticsearch.service && yum -y update elasticsearch && reboot'
@@ -217,7 +217,7 @@ echo ""
 echo "Re-enabling shard allocation"
 curl --silent -X PUT -u elastic:$elastic1 https://$m1:9200/_cluster/settings \
   -H "Content-Type: application/json" \
-  -d '{"persistent":{"cluster.routing.allocation.enable":"all"}}'
+  -d '{"persistent":{"cluster.routing.allocation.enable":null}}'
 echo ""
 
 while true; do
@@ -247,7 +247,7 @@ echo ""
 echo "Disable shard allocation..."
 curl --silent -X PUT -u elastic:$elastic1 https://$d1:9200/_cluster/settings \
   -H "Content-Type: application/json" \
-  -d '{"persistent":{"cluster.routing.allocation.enable":"none"}}'
+  -d '{"persistent":{"cluster.routing.allocation.enable":"primaries"}}'
 echo ""
   
 ssh $m1 'systemctl stop elasticsearch.service && yum -y update elasticsearch && reboot'
@@ -268,7 +268,7 @@ echo ""
 echo "Re-enabling shard allocation"
 curl --silent -X PUT -u elastic:$elastic1 https://$d1:9200/_cluster/settings \
   -H "Content-Type: application/json" \
-  -d '{"persistent":{"cluster.routing.allocation.enable":"all"}}'
+  -d '{"persistent":{"cluster.routing.allocation.enable":null}}'
 echo ""
 
 while true; do

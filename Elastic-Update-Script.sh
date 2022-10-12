@@ -115,7 +115,7 @@ d2=$(echo $dna | grep -oE '[^ ]+$').$domain
 
 echo -e "1st node will be $RED" $d1 "$NORMAL"
 echo -e "2nd node will be $RED" $d2 "$NORMAL"
-echo -e "at least master node will be $RED" $m1 "$NORMAL"
+echo -e "last but not least master node will be $RED" $m1 "$NORMAL"
 echo ""
 curl --silent -XGET -u elastic:$elastic1 https://$n1.$domain:9200/_cat/nodes
 echo ""

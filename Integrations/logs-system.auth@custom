@@ -1,0 +1,25 @@
+[
+  {
+    "dissect": {
+      "field": "message",
+      "pattern": "%{event.action}(%{}:%{}): %{event.outcome}; logname=%{} uid=%{} euid=%{} tty=%{} ruser=%{source.user.name} rhost=%{} user=%{user.name}",
+      "ignore_missing": true,
+      "if": "ctx.message != null && ctx.message =~ /^pam_unix/"
+    }
+  },
+  {
+    "set": {
+      "field": "event.category",
+      "value": "authentication"
+    }
+  },
+  {
+    "set": {
+      "field": "event.outcome",
+      "value": "failure",
+      "ignore_empty_value": true,
+      "if": "ctx.event.outcome == \"authentication failure\"",
+      "ignore_failure": true
+    }
+  }
+]

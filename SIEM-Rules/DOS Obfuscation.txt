@@ -1,0 +1,4 @@
+    sequence by process.pid with maxspan=30s
+      [ process where process.name == "cmd.exe" ]
+      [ registry where registry.key : "System\\CurrentControlSet\\Services\\*\\UserSettings\\*\\cmd.exe" and winlog.event_data.EventType == "SetValue" ]
+      

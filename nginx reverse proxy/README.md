@@ -7,9 +7,12 @@ Motivation:
 
 :small_orange_diamond: - auth. methods basic, bearer token and api key has to brute force prevention
 
-:small_orange_diamond: - brute force prevention is only availiable with SAML and SSO integration
+:small_orange_diamond: - brute force prevention is only availiable with external Identity Provide integrations.
 
 :small_orange_diamond: - secure a On-Premise Elastic Stack for Elastic-Agents connecting from anywhere
+
+:small_orange_diamond: - There is no mTLS for Elastic-Agent
+
 
 
 Service available:

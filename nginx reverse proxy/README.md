@@ -2,6 +2,16 @@
 
 This nginx reverse proxy settings allows only api key authentication !
 
+
+Motivation:
+
+:small_orange_diamond: - auth. methods basic, bearer token and api key has to brute force prevention
+
+:small_orange_diamond: - brute force prevention is only availiable with SAML and SSO integration
+
+:small_orange_diamond: - secure a On-Premise Elastic Stack for Elastic-Agents connecting from anywhere
+
+
 Service available:
 
 :white_check_mark: Sending logs from Elastic-Agent to Elasticsearch Node API /_bulk
@@ -11,7 +21,6 @@ Service available:
 :white_check_mark: Elastic-Agent Policy Changes 
 
 :question: Agent Rollout
-
 
 
 HTTP Header looks like this ...

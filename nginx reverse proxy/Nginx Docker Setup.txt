@@ -1,0 +1,19 @@
+# Directory Content:
+# ~/nginx/conf.d
+# proxy.conf
+# http.pem
+# http.key
+
+# Directory Content:
+# ~/nginx/log
+# access.log
+# error.log
+
+
+docker run -dti -p 443:443 --name nginx --restart=always \
+ -v ~/nginx/conf.d:/etc/nginx/conf.d \
+ -v ~/nginx/log:/var/log/nginx \
+  nginx:stable
+
+# Enter Docker nginx bash
+docker exec -it nginx /bin/bash

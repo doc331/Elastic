@@ -1,0 +1,5 @@
+select * from hash where path like 'c:\temp\%';
+
+
+SELECT concat('https://www.virustotal.com/gui/file/', sha1) AS VtLink, sha1, path
+from hash where path like 'c:\temp\%';

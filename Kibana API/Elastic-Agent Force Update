@@ -1,0 +1,7 @@
+Elastic Dev. Console 
+->
+POST kbn:/api/fleet/agents/>agentID</upgrade
+{
+  "force": true,
+  "version": "8.10.2"
+}

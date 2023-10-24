@@ -1,0 +1,19 @@
+Definition
+
+Index patterns
+    logs-windows.*
+Filters
+    winlog.event_id: is one of 3, 1
+    destination.ip: exists
+     {"wildcard":{"process.executable":"*AppData*"}}
+Rule type
+    Query
+Timeline template
+    None
+
+Schedule
+
+Runs every
+    5m
+Additional look-back time
+    1m

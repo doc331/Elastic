@@ -1,0 +1,31 @@
+### Active Directory SPN Enumeration ###
+
+Definition
+
+ES|QL query
+    from logs-system.security* [metadata _id, _index, _version]
+
+    | WHERE event.code == "4662" and not user.name like "*$" and winlog.event_data.SubjectUserName IS NOT NULL
+
+    | stats var0 = count(*)
+
+    | where var0 > 20
+Rule type
+    ES|QLTechnical Preview
+Timeline template
+    None
+
+
+
+Definition
+
+Index patterns
+    logs-system.security*
+Custom query
+    event.code: "4662" and not user.name: *$ and winlog.event_data.SubjectUserName: * 
+Rule type
+    Threshold
+Timeline template
+    None
+Threshold
+    All results >= 20

@@ -1,0 +1,321 @@
+PUT _ingest/pipeline/logs-cylance.json-default
+{
+  "processors": [
+    {
+      "json": {
+        "field": "message",
+        "target_field": "api",
+        "on_failure": [
+          {
+            "drop": {}
+          }
+        ]
+      }
+    },
+    {
+      "set": {
+        "field": "event.dataset",
+        "value": "cylance.devices",
+        "if": "ctx.log.file.path == \"/etc/cylanceapi/cyl_devices.txt\""
+      }
+    },
+    {
+      "set": {
+        "field": "event.dataset",
+        "value": "cylance.threats",
+        "if": "ctx.log.file.path == \"/etc/cylanceapi/cyl_threats.txt\""
+      }
+    },
+    {
+      "set": {
+        "field": "event.dataset",
+        "value": "cylance.detections",
+        "if": "ctx.log.file.path == \"/etc/cylanceapi/cyl_detections.txt\""
+      }
+    },
+    {
+      "set": {
+        "field": "event.dataset",
+        "value": "cylance.mempro",
+        "if": "ctx.log.file.path == \"/etc/cylanceapi/cyl_mempro.txt\""
+      }
+    },
+    {
+      "set": {
+        "field": "event.dataset",
+        "value": "cylance.globallist",
+        "if": "ctx.log.file.path == \"/etc/cylanceapi/cyl_globallist.txt\""
+      }
+    },
+    {
+      "fingerprint": {
+        "fields": [
+          "api.PhoneticId"
+        ],
+        "target_field": "_id",
+        "method": "SHA-256",
+        "if": "ctx.event.dataset == \"cylance.detections\"",
+        "description": "cylance.detections"
+      }
+    },
+    {
+      "fingerprint": {
+        "fields": [
+          "api.device_image_file_event_id"
+        ],
+        "target_field": "_id",
+        "method": "SHA-256",
+        "ignore_missing": true,
+        "if": "ctx.event.dataset == \"cylance.mempro\"",
+        "ignore_failure": true,
+        "description": "cylance.mempro"
+      }
+    },
+    {
+      "fingerprint": {
+        "fields": [
+          "api.md5",
+          "api.safelisted",
+          "api.global_quarantined",
+          "api.sha256"
+        ],
+        "target_field": "_id",
+        "method": "SHA-256",
+        "ignore_missing": true,
+        "if": "ctx.event.dataset == \"cylance.threats\"",
+        "ignore_failure": true,
+        "description": "cylance.threats"
+      }
+    },
+    {
+      "fingerprint": {
+        "fields": [
+          "api.category",
+          "api.list_type",
+          "api.sha256"
+        ],
+        "target_field": "_id",
+        "method": "SHA-256",
+        "ignore_missing": true,
+        "if": "ctx.event.dataset == \"cylance.globallist\"",
+        "ignore_failure": true,
+        "description": "cylance.globallist"
+      }
+    },
+    {
+      "date": {
+        "field": "api.created",
+        "formats": [
+          "yyyy-MM-dd'T'HH:mm:ss",
+          "yyyy-MM-ddTHH:mm:ss"
+        ],
+        "if": "ctx.log.file.path == \"/etc/cylanceapi/cyl_mempro.txt\"",
+        "description": "mempro api.created"
+      }
+    },
+    {
+      "date": {
+        "field": "api.last_found",
+        "formats": [
+          "yyyy-MM-dd'T'HH:mm:ss",
+          "yyyy-MM-ddTHH:mm:ss"
+        ],
+        "if": "ctx.log.file.path == \"/etc/cylanceapi/cyl_threats.txt\"",
+        "description": "threats api.last_found"
+      }
+    },
+    {
+      "date": {
+        "field": "api.ReceivedTime",
+        "formats": [
+          "ISO8601"
+        ],
+        "if": "ctx.log.file.path == \"/etc/cylanceapi/cyl_detections.txt\"",
+        "description": "detections api.ReceivedTime"
+      }
+    },
+    {
+      "date": {
+        "field": "api.added",
+        "formats": [
+          "ISO8601"
+        ],
+        "if": "ctx.log.file.path == \"/etc/cylanceapi/cyl_globallist.txt\"",
+        "description": "globallist api.added"
+      }
+    },
+    {
+      "enrich": {
+        "field": "api.device_id",
+        "policy_name": "cylance-enrich-policy",
+        "target_field": "device_name",
+        "ignore_missing": true,
+        "tag": "cyl_enrich_policy_api.device_id"
+      }
+    },
+    {
+      "set": {
+        "field": "api.Device.Name",
+        "copy_from": "device_name.cylance.name",
+        "ignore_empty_value": true,
+        "tag": "rename_api.Device.Name"
+      }
+    },
+    {
+      "enrich": {
+        "field": "api.added_by",
+        "policy_name": "cylance-enrich-policy",
+        "target_field": "api.added",
+        "ignore_missing": true,
+        "tag": "cyl_enrich_policy_added_by"
+      }
+    },
+    {
+      "set": {
+        "field": "api.added.name",
+        "copy_from": "api.added.cylance.email",
+        "if": "ctx.event?.dataset == \"cylance.globallist\" && ctx.event?.dataset != null && ctx.event?.dataset != \"\"",
+        "tag": "set_api.added.name"
+      }
+    },
+    {
+      "set": {
+        "field": "api.action_no",
+        "copy_from": "api.action",
+        "ignore_empty_value": true,
+        "if": "ctx.event.dataset == 'cylance.mempro'"
+      }
+    },
+    {
+      "set": {
+        "field": "api.violation_type_no",
+        "copy_from": "api.violation_type",
+        "ignore_empty_value": true,
+        "if": "ctx.event.dataset == 'cylance.mempro'"
+      }
+    },
+    {
+      "convert": {
+        "field": "api.action",
+        "type": "string",
+        "if": "ctx.event.dataset == 'cylance.mempro'"
+      }
+    },
+    {
+      "convert": {
+        "field": "api.violation_type",
+        "type": "string",
+        "if": "ctx.event.dataset == 'cylance.mempro'"
+      }
+    },
+    {
+      "script": {
+        "source": "def status = params[ctx.api.action];\r\nif (status != null) {\r\n  ctx.api.action = status;\r\n}",
+        "params": {
+          "0": "None",
+          "2": "Block",
+          "3": "Terminate"
+        },
+        "if": "ctx.event.dataset == \"cylance.mempro\"",
+        "description": "mempro action"
+      }
+    },
+    {
+      "script": {
+        "source": "def vio = params[ctx.api.violation_type];\r\nif (vio != null) {\r\n  ctx.api.violation_type = vio;\r\n}",
+        "params": {
+          "1": "Stack pivot",
+          "2": "Stack protect",
+          "3": "Overwrite code",
+          "4": "Remote allocation of memory",
+          "5": "Remote mapping of memory",
+          "6": "Remote write to memory",
+          "7": "Remote write PE to memory",
+          "8": "Remote overwrite code",
+          "9": "Remote unmap of memory",
+          "10": "Remote thread creation",
+          "11": "Remote APC scheduled",
+          "12": "LSASS read",
+          "13": "RAM scraping",
+          "22": "Zero allocate",
+          "23": "DYLD injection",
+          "24": "Malicous payload",
+          "25": "Dangerous VBA Macro",
+          "27": "Memory Permission changes in Other processes",
+          "28": "Memory Permission Changes in Child Processes",
+          "32": "System DLL Overwrite",
+          "38": "Injection via APC"
+        },
+        "if": "ctx.event.dataset == \"cylance.mempro\"",
+        "ignore_failure": true,
+        "description": "mempro violation code"
+      }
+    },
+    {
+      "script": {
+        "source": "void iterateAllFields(def x) {\r\n             if (x instanceof List) {\r\n               for (def v: x) {\r\n                 iterateAllFields(v);\r\n               }\r\n             }\r\n             if (!(x instanceof Map)) {\r\n               return;\r\n             }\r\n             x.entrySet().removeIf(e -> e.getKey() =~ /host.*/);\r\n             for (def v: x.values()) {\r\n               iterateAllFields(v);\r\n             }\r\n           }\r\n\r\n           iterateAllFields(ctx);",
+        "description": "remove nested fields host.*"
+      }
+    },
+    {
+      "set": {
+        "field": "tags",
+        "value": "cylance-api"
+      }
+    },
+    {
+      "rename": {
+        "field": "api.file_hash_id",
+        "target_field": "file.hash.sha256",
+        "ignore_missing": true,
+        "tag": "rename_file.hash.sha256"
+      }
+    },
+    {
+      "rename": {
+        "field": "api.sha256",
+        "target_field": "file.hash.sha256",
+        "ignore_missing": true,
+        "tag": "rename_file.hash.sha256"
+      }
+    },
+    {
+      "rename": {
+        "field": "api.md5",
+        "target_field": "file.hash.md5",
+        "ignore_missing": true,
+        "tag": "rename_file.hash.md5"
+      }
+    },
+    {
+      "set": {
+        "field": "user.name",
+        "copy_from": "api.user_name",
+        "ignore_empty_value": true,
+        "tag": "set_api.user_name"
+      }
+    },
+    {
+      "set": {
+        "field": "host.name",
+        "copy_from": "api.Device.Name",
+        "ignore_empty_value": true,
+        "tag": "set_api.Device.Name"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "md-enrich-ecs"
+      }
+    }
+  ],
+  "on_failure": [
+    {
+      "set": {
+        "field": "error.message",
+        "value": "Processor \"{{ _ingest.on_failure_processor_type }}\" with tag \"{{ _ingest.on_failure_processor_tag }}\" in pipeline \"{{ _ingest.on_failure_pipeline }}\" failed with message \"{{ _ingest.on_failure_message }}\"",
+        "ignore_failure": true
+      }
+    }
+  ]
+}

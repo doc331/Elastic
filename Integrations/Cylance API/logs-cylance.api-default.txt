@@ -1,0 +1,142 @@
+PUT _ingest/pipeline/logs-cylance.api-default
+{
+  "processors": [
+    {
+      "pipeline": {
+        "name": "logs-cylance.json-default",
+        "if": "ctx.message.startsWith('{')"
+      }
+    },
+    {
+      "set": {
+        "field": "event.original",
+        "copy_from": "message"
+      }
+    },
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          "%{POSINT:log.syslog.priority} <%{INT:log.syslog.version}>1 %{TIMESTAMP_ISO8601:event.created} %{WORD} %{WORD:event.provider} %{GREEDYDATA}Event Type: %{WORD:event.dataset}, %{GREEDYDATA:msg}"
+        ],
+        "ignore_failure": true
+      }
+    },
+    {
+      "set": {
+        "field": "event.dataset",
+        "value": "cylance.{{event.dataset}}",
+        "ignore_empty_value": true,
+        "if": "ctx.event.provider == \"CylancePROTECT\"",
+        "ignore_failure": true,
+        "description": "rename event.dataset to cylance.event"
+      }
+    },
+    {
+      "lowercase": {
+        "field": "event.dataset",
+        "ignore_missing": true,
+        "ignore_failure": true
+      }
+    },
+    {
+      "dissect": {
+        "field": "msg",
+        "pattern": "Event Name: %{event.action}, Device Name: %{host.name}, File Path: %{file.path}, SHA256: %{file.hash.sha256}, Interpreter: %{cylance.interpreter}, Interpreter Version: %{cylance.interpreter_version}, Zone Names: (%{cylance.zone_name}), User Name: %{user.name}, Device Id: %{cylance.device_id}, Policy Name: %{cylance.policy_name}",
+        "ignore_missing": true,
+        "if": "ctx.event.dataset == \"cylance.scriptcontrol\"",
+        "ignore_failure": true,
+        "description": "cylance.scriptcontrol"
+      }
+    },
+    {
+      "dissect": {
+        "field": "msg",
+        "pattern": "Event Name: %{event.action}, Device Name: %{host.name}, Agent Version: %{}, IP Address: (%{client.address}), MAC Address: (%{host.mac}), Logged On Users: (%{user.name}), OS: %{}, Kernel Version: %{}, Optics Version: %{}, Zone Names: (%{})",
+        "ignore_missing": true,
+        "if": "ctx.event.dataset == \"cylance.device\"",
+        "description": "cylance.device",
+        "on_failure": [
+          {
+            "dissect": {
+              "field": "msg",
+              "pattern": "Event Name: %{event.action}, Device Name: %{host.name}, Agent Version: %{}, IP Address: (%{client.address}), MAC Address: (%{host.mac}), Logged On Users: (%{user.name}), OS: %{}, Kernel Version: %{kernel}, Zone Names: (%{})",
+              "ignore_failure": true
+            }
+          }
+        ]
+      }
+    },
+    {
+      "dissect": {
+        "field": "msg",
+        "pattern": "Event Name: %{event.action}, Device Name: %{host.name}, External Device Type: %{cylance.ext.type}, External Device Vendor ID: %{cylance.ext.vendor_id}, External Device Name: %{cylance.ext.name}, External Device Product ID: %{cylance.ext.id}, External Device Serial Number: %{cylance.ext.serial}, Zone Names: (%{}), Device Id: %{cylance.device_id}, Policy Name: %{cylance.policy_name}",
+        "ignore_missing": true,
+        "if": "ctx.event.dataset == \"cylance.devicecontrol\"",
+        "ignore_failure": true,
+        "description": "cylance.devicecontrol"
+      }
+    },
+    {
+      "dissect": {
+        "field": "msg",
+        "pattern": "Event Name: %{event.action}, Device Name: %{host.name}, IP Address: (%{client.address}), Action: %{api.action}, Process ID: %{}, Process Name: %{file.path}, User Name: %{user.name}, Violation Type: %{api.violation_type}, Zone Names: %{}, Device Id: %{api.device_id}, Policy Name: %{cylance.policy.name}",
+        "ignore_missing": true,
+        "if": "ctx.event.dataset == \"cylance.exploitattempt\"",
+        "ignore_failure": true,
+        "description": "cylance.exploitattempt"
+      }
+    },
+    {
+      "dissect": {
+        "field": "msg",
+        "pattern": "Event Name: %{event.action}, Device Name: %{host.name}, IP Address: (%{client.address}), File Name: %{file.name}, Path: %{file.path}, Drive Type: %{cylance.driver_type}, File Owner: %{user.name}, SHA256: %{file.hash.sha256}, MD5: %{file.hash.md5}, Status: %{cylance.status_threat}, Cylance Score: %{cylance.score}, Found Date: %{cylance.found_date}, File Type: %{cylance.file_typ}, Is Running: %{cylance.is_running}, Auto Run: %{cylance.auto_run}, Detected By: %{cylance.detected_by}, Zone Names: %{}, Is Malware: %{cylance.is_malware}, Is Unique To Cylance: %{api.unique_to_cylance}, Threat Classification: %{api.classification}, Device Id: %{api.device_id}, Policy Name: %{cylance.policy.name}",
+        "ignore_missing": true,
+        "if": "ctx.event.dataset == \"cylance.threat\"",
+        "ignore_failure": true,
+        "description": "cylance.threat"
+      }
+    },
+    {
+      "gsub": {
+        "field": "user.name",
+        "pattern": ".*\\\\",
+        "replacement": "",
+        "ignore_missing": true,
+        "ignore_failure": true
+      }
+    },
+    {
+      "split": {
+        "field": "client.address",
+        "separator": ",",
+        "target_field": "client.ip",
+        "if": "ctx?.client?.address != null && ctx?.client?.address != \"-\" && ctx?.client?.address != ''",
+        "ignore_failure": true
+      }
+    },
+    {
+      "lowercase": {
+        "field": "file.hash.sha256",
+        "ignore_missing": true,
+        "ignore_failure": true
+      }
+    },
+    {
+      "lowercase": {
+        "field": "file.hash.md5",
+        "ignore_missing": true,
+        "ignore_failure": true
+      }
+    }
+  ],
+  "on_failure": [
+    {
+      "set": {
+        "field": "tags",
+        "value": "parsing_error_cyl_syslog",
+        "ignore_failure": true
+      }
+    }
+  ]
+}
